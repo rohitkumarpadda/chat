@@ -295,7 +295,7 @@ export const generatePgpKeyPair = async ({
 }: GenerateKeyPairParams) => {
   const { privateKey, publicKey, revocationCertificate } = await generateKey({
     type: "rsa",
-    rsaBits: 4096,
+    rsaBits: 2048,
     userIDs: [{ name, email }], // you can pass multiple user IDs
     passphrase, // protects the private key
     format: "armored",
