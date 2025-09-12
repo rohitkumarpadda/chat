@@ -1,0 +1,1 @@
+{"version":3,"file":"conversationGuard.d.ts","sourceRoot":"","sources":["../../../../src/api/chat/middleware/conversationGuard.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAI1D,eAAO,MAAM,iBAAiB,QACvB,OAAO,OACP,QAAQ,QACP,YAAY,uDAmCnB,CAAC"}

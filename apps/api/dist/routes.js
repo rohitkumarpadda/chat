@@ -1,0 +1,12 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var api_1 = require("~/api");
+var key_1 = require("./api/key");
+var router = (0, express_1.Router)();
+//router.use("/example", exampleRouter);
+router.use("/auth", api_1.authRouter);
+router.use("/user", api_1.userRouter);
+router.use("/chat", api_1.chatRouter);
+router.use("/key", key_1.keyRouter);
+exports["default"] = router;

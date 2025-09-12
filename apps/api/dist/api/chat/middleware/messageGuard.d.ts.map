@@ -1,0 +1,1 @@
+{"version":3,"file":"messageGuard.d.ts","sourceRoot":"","sources":["../../../../src/api/chat/middleware/messageGuard.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG1D;;;GAGG;AACH,eAAO,MAAM,YAAY,QAClB,OAAO,OACP,QAAQ,QACP,YAAY,4DAoCnB,CAAC"}

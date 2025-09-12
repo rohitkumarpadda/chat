@@ -1,0 +1,1 @@
+{"version":3,"file":"socketAuthMiddleware.d.ts","sourceRoot":"","sources":["../../src/middleware/socketAuthMiddleware.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,WAAW,CAAC;AACnC,OAAO,EAAE,aAAa,EAAE,MAAM,0BAA0B,CAAC;AAKzD,eAAO,MAAM,oBAAoB,WACvB,MAAM,eACD,aAAa,GAAG,SAAS,KAAK,IAAI,SA8BhD,CAAC"}
