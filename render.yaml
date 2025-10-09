@@ -1,0 +1,27 @@
+services:
+  # Backend API Service
+  - type: web
+    name: cipherchat-api
+    runtime: node
+    region: oregon
+    buildCommand: yarn install && yarn turbo run build --filter=cipherchat-api
+    startCommand: cd apps/api && yarn start
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false
+      # Add other environment variables as needed
+    
+    # Auto-deploy from your git repository
+    autoDeploy: true

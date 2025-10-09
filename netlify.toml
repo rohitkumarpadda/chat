@@ -1,0 +1,26 @@
+[build]
+  # Base directory for the build
+  base = "apps/web"
+  
+  # Build command
+  command = "cd ../.. && yarn install && yarn turbo run build --filter=cipherchat-web"
+  
+  # Publish directory (Next.js output)
+  publish = "apps/web/.next"
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "18"
+  
+  # Enable yarn workspaces
+  NPM_FLAGS = "--prefix=../.."
+
+# Redirect all requests to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables (set these in Netlify dashboard)
+# NEXT_PUBLIC_API_URL - Your backend API URL (e.g., https://your-app.onrender.com)
+# NEXT_PUBLIC_SOCKET_URI - Your backend socket URL
