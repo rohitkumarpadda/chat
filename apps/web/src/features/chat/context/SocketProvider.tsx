@@ -23,8 +23,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// Create socket with auth token
 		console.log('Creating socket with auth token...');
-		console.log('Token length:', accessToken.length, 'Token preview:', accessToken.substring(0, 20) + '...');
-		
+		console.log(
+			'Token length:',
+			accessToken.length,
+			'Token preview:',
+			accessToken.substring(0, 20) + '...'
+		);
+
 		const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URI!, {
 			auth: {
 				token: accessToken,
@@ -48,7 +53,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 		newSocket.on('disconnect', (reason) => {
 			console.log('❌ Socket disconnected. Reason:', reason);
 			if (reason === 'io server disconnect') {
-				console.log('⚠️ Server disconnected the socket - likely authentication failed');
+				console.log(
+					'⚠️ Server disconnected the socket - likely authentication failed'
+				);
 			}
 			setConnected(false);
 		});

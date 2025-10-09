@@ -139,7 +139,9 @@ const handleConnectEvent = (socket: Socket, io: SocketServer) => {
 		const token = verifyJWT(tokenString);
 
 		if (token) {
-			console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
+			console.log(
+				`✅ User connected: ${socket.id} | User ID: ${token.user.id}`
+			);
 			//   console.log("[handleConnectEvent]: ", token);
 
 			//Store the user id and socket id in the users object
@@ -153,7 +155,10 @@ const handleConnectEvent = (socket: Socket, io: SocketServer) => {
 			socket.disconnect();
 		}
 	} catch (error) {
-		console.log('❌ [socket]: Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
+		console.log(
+			'❌ [socket]: Token verification failed:',
+			error instanceof Error ? error.message : 'Unknown error'
+		);
 		io.to(socket.id).emit('exception', {
 			message: 'Unauthorized - Token verification failed',
 		});

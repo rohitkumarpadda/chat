@@ -1,6 +1,7 @@
 # Socket Authentication Fix - Login Successful but Disconnects
 
 ## Problem Summary
+
 - ✅ User registration works
 - ✅ User stored in database
 - ✅ Login shows "Login successful"
@@ -22,35 +23,38 @@ The socket authentication was failing because:
 **File:** `apps/api/src/socket/handleSocketEvents.ts`
 
 **Before (Broken):**
+
 ```typescript
 const token = verifyJWT(tokenString); // ❌ Throws error if invalid
 
 if (token) {
-  // connect user
+	// connect user
 } else {
-  // disconnect
+	// disconnect
 }
 ```
 
 **After (Fixed):**
+
 ```typescript
 try {
-  const token = verifyJWT(tokenString);
-  
-  if (token) {
-    console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
-    addUser(socket.id, token.user.id);
-  }
+	const token = verifyJWT(tokenString);
+
+	if (token) {
+		console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
+		addUser(socket.id, token.user.id);
+	}
 } catch (error) {
-  console.log('❌ [socket]: Token verification failed:', error.message);
-  io.to(socket.id).emit('exception', {
-    message: 'Unauthorized - Token verification failed',
-  });
-  socket.disconnect();
+	console.log('❌ [socket]: Token verification failed:', error.message);
+	io.to(socket.id).emit('exception', {
+		message: 'Unauthorized - Token verification failed',
+	});
+	socket.disconnect();
 }
 ```
 
 **Benefits:**
+
 - ✅ Catches JWT verification errors (expired, malformed, invalid signature)
 - ✅ Logs specific error messages
 - ✅ Gracefully disconnects with error message
@@ -61,6 +65,7 @@ try {
 **File:** `apps/web/src/features/chat/context/SocketProvider.tsx`
 
 **Added:**
+
 - ✅ Better logging (token length, preview)
 - ✅ Connection timeout (10 seconds)
 - ✅ Reconnection settings (5 attempts, 1s delay)
@@ -69,30 +74,30 @@ try {
 
 ```typescript
 const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URI!, {
-  auth: {
-    token: accessToken,
-  },
-  extraHeaders: {
-    Authorization: `Bearer ${accessToken}`,
-  },
-  transports: ['websocket', 'polling'],
-  reconnection: true,          // ✅ NEW
-  reconnectionAttempts: 5,     // ✅ NEW
-  reconnectionDelay: 1000,     // ✅ NEW
-  timeout: 10000,              // ✅ NEW
+	auth: {
+		token: accessToken,
+	},
+	extraHeaders: {
+		Authorization: `Bearer ${accessToken}`,
+	},
+	transports: ['websocket', 'polling'],
+	reconnection: true, // ✅ NEW
+	reconnectionAttempts: 5, // ✅ NEW
+	reconnectionDelay: 1000, // ✅ NEW
+	timeout: 10000, // ✅ NEW
 });
 
 // Better disconnect handling
 newSocket.on('disconnect', (reason) => {
-  console.log('❌ Socket disconnected. Reason:', reason);
-  if (reason === 'io server disconnect') {
-    console.log('⚠️ Server disconnected - likely authentication failed');
-  }
+	console.log('❌ Socket disconnected. Reason:', reason);
+	if (reason === 'io server disconnect') {
+		console.log('⚠️ Server disconnected - likely authentication failed');
+	}
 });
 
 // Connection error handling
 newSocket.on('connect_error', (error) => {
-  console.error('❌ Socket connection error:', error.message);
+	console.error('❌ Socket connection error:', error.message);
 });
 ```
 
@@ -101,6 +106,7 @@ newSocket.on('connect_error', (error) => {
 ### Successful Connection
 
 **Frontend Console:**
+
 ```
 Creating socket with auth token...
 Token length: 485 Token preview: eyJhbGciOiJSUzI1NiIs...
@@ -109,6 +115,7 @@ Transport: websocket
 ```
 
 **Backend (Render) Logs:**
+
 ```
 ✅ User connected: abc123xyz | User ID: 507f1f77bcf86cd799439011
 [socket] users: { abc123xyz: '507f1f77bcf86cd799439011' }
@@ -117,6 +124,7 @@ Transport: websocket
 ### Failed Authentication
 
 **Frontend Console:**
+
 ```
 Creating socket with auth token...
 Token length: 485 Token preview: eyJhbGciOiJSUzI1NiIs...
@@ -126,6 +134,7 @@ Token length: 485 Token preview: eyJhbGciOiJSUzI1NiIs...
 ```
 
 **Backend (Render) Logs:**
+
 ```
 ❌ [socket]: Token verification failed: jwt expired
 ```
@@ -139,53 +148,66 @@ or
 ## Common Issues & Solutions
 
 ### Issue 1: Token Expired
+
 **Symptom:**
+
 ```
 ❌ [socket]: Token verification failed: jwt expired
 ```
 
 **Solution:**
+
 - Tokens expire after 14 days
 - Log out and log back in to get fresh token
 - Or implement token refresh mechanism
 
 ### Issue 2: Render Service Sleeping
+
 **Symptom:**
+
 ```
 ❌ Socket connection error: timeout
 ❌ Socket disconnected. Reason: transport close
 ```
 
 **Solution:**
+
 - Render free tier sleeps after 15 min inactivity
 - First request wakes service (takes 30-60s)
 - Socket will automatically reconnect (up to 5 attempts)
 - Wait and let reconnection happen
 
 ### Issue 3: Wrong Environment Variable
+
 **Symptom:**
+
 ```
 ❌ Socket connection error: 404
 ```
 
 **Solution:**
+
 - Check `NEXT_PUBLIC_SOCKET_URI` in Netlify
 - Should be: `https://cipherchat-api.onrender.com`
 - NOT: `wss://...` or with `/socket.io` path
 
 ### Issue 4: CORS Issues
+
 **Symptom:**
+
 ```
 ❌ Socket connection error: CORS
 ```
 
 **Solution:**
 In Render, check `CORS_ORIGIN` environment variable:
+
 ```
 CORS_ORIGIN=https://cipher-chat-io.netlify.app
 ```
 
 Or for testing:
+
 ```
 CORS_ORIGIN=*
 ```
@@ -195,6 +217,7 @@ CORS_ORIGIN=*
 ### Step 1: Check Frontend Console
 
 **What to look for:**
+
 1. Token being created: `Token length: 485...`
 2. Connection attempt: `Creating socket with auth token...`
 3. Connection result: `✅ Socket connected` or `❌ Socket connection error`
@@ -203,11 +226,13 @@ CORS_ORIGIN=*
 ### Step 2: Check Render Backend Logs
 
 **What to look for:**
+
 1. Connection attempt received
 2. Token verification success or error
 3. User added to users object or disconnected
 
 **Access logs:**
+
 - Go to Render Dashboard
 - Select your service
 - Click "Logs" tab
@@ -225,10 +250,12 @@ CORS_ORIGIN=*
 ### Step 4: Verify Environment Variables
 
 **Netlify:**
+
 - `NEXT_PUBLIC_SOCKET_URI` = `https://cipherchat-api.onrender.com`
 - `NEXT_PUBLIC_API_URL` = `https://cipherchat-api.onrender.com`
 
 **Render:**
+
 - `MONGODB_URI` = Your MongoDB Atlas connection string
 - `CORS_ORIGIN` = Your Netlify URL
 - `JWT_SECRET` = Any secure random string
@@ -250,6 +277,7 @@ CORS_ORIGIN=*
 ## Build Status
 
 ✅ **Both builds successful:**
+
 ```
 Tasks:    2 successful, 2 total
 Time:    13.402s
@@ -301,4 +329,4 @@ Check the console messages and Render logs, then:
 
 ---
 
-*Last Updated: October 9, 2025*
+_Last Updated: October 9, 2025_
