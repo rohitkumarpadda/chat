@@ -23,6 +23,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// Create socket with auth token
 		console.log('Creating socket with auth token...');
+		console.log('Token length:', accessToken.length, 'Token preview:', accessToken.substring(0, 20) + '...');
+		
 		const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URI!, {
 			auth: {
 				token: accessToken,
@@ -31,16 +33,28 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 				Authorization: `Bearer ${accessToken}`,
 			},
 			transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
+			reconnection: true,
+			reconnectionAttempts: 5,
+			reconnectionDelay: 1000,
+			timeout: 10000, // 10 second connection timeout
 		});
 
 		newSocket.on('connect', () => {
 			console.log('✅ Socket connected:', newSocket.id);
+			console.log('Transport:', newSocket.io.engine.transport.name);
 			setConnected(true);
 		});
 
 		newSocket.on('disconnect', (reason) => {
-			console.log('❌ Socket disconnected:', reason);
+			console.log('❌ Socket disconnected. Reason:', reason);
+			if (reason === 'io server disconnect') {
+				console.log('⚠️ Server disconnected the socket - likely authentication failed');
+			}
 			setConnected(false);
+		});
+
+		newSocket.on('connect_error', (error) => {
+			console.error('❌ Socket connection error:', error.message);
 		});
 
 		newSocket.on('error', (error) => {

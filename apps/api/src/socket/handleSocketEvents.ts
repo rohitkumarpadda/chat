@@ -134,22 +134,29 @@ const handleConnectEvent = (socket: Socket, io: SocketServer) => {
 		tokenString = socket.handshake.auth.token;
 	}
 
-	const token = verifyJWT(tokenString);
+	// Verify the token with error handling
+	try {
+		const token = verifyJWT(tokenString);
 
-	if (token) {
-		console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
-		//   console.log("[handleConnectEvent]: ", token);
+		if (token) {
+			console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
+			//   console.log("[handleConnectEvent]: ", token);
 
-		//Store the user id and socket id in the users object
-		addUser(socket.id, token.user.id);
-		console.log('[socket] users:', users);
-	} else {
-		console.log('❌ [socket]: unauthorized - no valid token');
-
-		io.emit('exception', {
-			message: 'Unauthorized',
+			//Store the user id and socket id in the users object
+			addUser(socket.id, token.user.id);
+			console.log('[socket] users:', users);
+		} else {
+			console.log('❌ [socket]: Token verification returned null');
+			io.to(socket.id).emit('exception', {
+				message: 'Unauthorized - Invalid token',
+			});
+			socket.disconnect();
+		}
+	} catch (error) {
+		console.log('❌ [socket]: Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
+		io.to(socket.id).emit('exception', {
+			message: 'Unauthorized - Token verification failed',
 		});
-
 		socket.disconnect();
 	}
 };
