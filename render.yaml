@@ -5,7 +5,7 @@ services:
     runtime: node
     region: oregon
     buildCommand: yarn install --frozen-lockfile && yarn workspace cipherchat-api build
-    startCommand: cd apps/api && yarn start
+    startCommand: cd apps/api && node -r esbuild-register ./src/server.ts
     plan: free
     healthCheckPath: /api/health
     envVars:
