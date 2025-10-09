@@ -4,6 +4,11 @@
 		"module": "CommonJS",
 		"outDir": "./dist",
 		"baseUrl": ".",
+		"rootDir": "./src",
+		"typeRoots": [
+			"../../node_modules/@types",
+			"./node_modules/@types"
+		],
 		"paths": {
 			"~/*": ["./src/*"],
 			"routes": ["./src/routes"],
@@ -12,7 +17,7 @@
 			"utils": ["./src/utils/"]
 		}
 	},
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules", "dist"],
 	"extends": "../../packages/tsconfig/base.json",
 	"include": ["src/**/*"]
 }

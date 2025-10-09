@@ -4,7 +4,7 @@ services:
     name: cipherchat-api
     runtime: node
     region: oregon
-    buildCommand: yarn install && yarn turbo run build --filter=cipherchat-api
+    buildCommand: yarn install --frozen-lockfile && yarn workspace cipherchat-api build
     startCommand: cd apps/api && yarn start
     plan: free
     healthCheckPath: /api/health

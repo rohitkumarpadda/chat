@@ -4,12 +4,13 @@
 # Exit on error
 set -o errexit
 
-# Install dependencies
+# Install dependencies from root
 echo "Installing dependencies..."
-yarn install
+cd ../..
+yarn install --frozen-lockfile
 
 # Build the API
 echo "Building API..."
-yarn build
+yarn workspace cipherchat-api build
 
 echo "Build completed successfully!"

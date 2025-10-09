@@ -62,6 +62,7 @@ export interface ServerToClientEvents {
 	getMessage: (data: GetMessageData) => void;
 	getEditMessage: (data: GetEditMessageData) => void;
 	getDeleteMessage: (data: GetDeleteMessageData) => void;
+	refreshConversations: () => void;
 }
 
 export interface ClientToServerEvents {

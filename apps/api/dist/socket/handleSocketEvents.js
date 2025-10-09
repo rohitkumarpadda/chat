@@ -14,50 +14,97 @@ var handleSocketEvents = function (socket, io) {
     //Handle connected
     handleConnectEvent(socket, io);
     //chat
-    socket.on("sendMessage", function (receivedPayload) {
+    socket.on('sendMessage', function (receivedPayload) {
         var receiverId = receivedPayload.receiverId, content = receivedPayload.content, senderContent = receivedPayload.senderContent, conversationId = receivedPayload.conversationId;
-        console.log("[socket]: sendMessage: " + content);
+        console.log('[socket]: sendMessage: ' + content);
         var senderId = users[socket.id]; //Get the sender id from the users object
-        console.log("[sendMessage]: senderId: " + senderId, "receiverId: " + receiverId);
+        console.log('[sendMessage]: senderId: ' + senderId, 'receiverId: ' + receiverId);
         //Send the message to the receiver
         for (var socketId in users) {
             if (users[socketId] === receiverId) {
-                console.log("[sendMessage ok] Private message to: " + receiverId);
+                console.log('[sendMessage ok] Private message to: ' + receiverId);
                 //Where we find the receiver socket id, we send the message
-                socket.to(socket.id).to(socketId).emit("getMessage", {
+                socket.to(socket.id).to(socketId).emit('getMessage', {
                     senderId: senderId,
                     senderContent: senderContent,
                     content: content,
                     conversationId: conversationId
                 });
+                // Also emit an event to refresh conversations in case it's a new conversation
+                socket.to(socketId).emit('refreshConversations');
             }
         }
         // io.emit("sendMessage", `${socket.id} said ${msg}`);
     });
-    socket.on("disconnect", function () { return handleDisconnectEvent(socket); });
+    //Edit message
+    socket.on('editMessage', function (receivedPayload) {
+        var receiverId = receivedPayload.receiverId, messageId = receivedPayload.messageId, content = receivedPayload.content, senderContent = receivedPayload.senderContent, conversationId = receivedPayload.conversationId;
+        console.log('[socket]: editMessage: ' + messageId);
+        var senderId = users[socket.id]; //Get the sender id from the users object
+        console.log('[editMessage]: senderId: ' + senderId, 'receiverId: ' + receiverId);
+        //Send the edit message event to the receiver
+        for (var socketId in users) {
+            if (users[socketId] === receiverId) {
+                console.log('[editMessage ok] Private message to: ' + receiverId);
+                //Where we find the receiver socket id, we send the edit event
+                socket.to(socket.id).to(socketId).emit('getEditMessage', {
+                    messageId: messageId,
+                    senderId: senderId,
+                    senderContent: senderContent,
+                    content: content,
+                    conversationId: conversationId,
+                    isEdited: true,
+                    editedAt: new Date()
+                });
+            }
+        }
+    });
+    //Delete message
+    socket.on('deleteMessage', function (receivedPayload) {
+        var receiverId = receivedPayload.receiverId, messageId = receivedPayload.messageId, conversationId = receivedPayload.conversationId;
+        console.log('[socket]: deleteMessage: ' + messageId);
+        var senderId = users[socket.id]; //Get the sender id from the users object
+        console.log('[deleteMessage]: senderId: ' + senderId, 'receiverId: ' + receiverId);
+        //Send the delete message event to the receiver
+        for (var socketId in users) {
+            if (users[socketId] === receiverId) {
+                console.log('[deleteMessage ok] Private message to: ' + receiverId);
+                //Where we find the receiver socket id, we send the delete event
+                socket.to(socket.id).to(socketId).emit('getDeleteMessage', {
+                    messageId: messageId,
+                    senderId: senderId,
+                    conversationId: conversationId,
+                    isDeleted: true,
+                    content: 'This message has been deleted',
+                    senderContent: 'This message has been deleted'
+                });
+            }
+        }
+    });
+    socket.on('disconnect', function () { return handleDisconnectEvent(socket); });
 };
 exports.handleSocketEvents = handleSocketEvents;
 var handleDisconnectEvent = function (socket) {
     console.log("user disconnect ".concat(socket.id));
     //Remove the user from the users object
     removeUser(socket.id);
-    console.log("[socket] users:", users);
+    console.log('[socket] users:', users);
 };
 var handleConnectEvent = function (socket, io) {
     var _a;
     //Verify and decode the JWT from the bearer header
-    var token = (0, jwt_1.verifyJWT)(((_a = socket.handshake.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "");
+    var token = (0, jwt_1.verifyJWT)(((_a = socket.handshake.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]) || '');
     if (token) {
         console.log("user connected: ".concat(socket.id, " ").concat(token.user.id));
         //   console.log("[handleConnectEvent]: ", token);
         //Store the user id and socket id in the users object
         addUser(socket.id, token.user.id);
-        console.log("[socket] users:", users);
+        console.log('[socket] users:', users);
     }
     else {
-        console.log("[socket]: unauthorized");
-        io.emit("exception", {
-            message: "Unauthorized"
+        console.log('[socket]: unauthorized');
+        io.emit('exception', {
+            message: 'Unauthorized'
         });
         socket.disconnect();
     }

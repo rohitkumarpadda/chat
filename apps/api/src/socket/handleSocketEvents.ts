@@ -1,15 +1,6 @@
 import { Socket } from 'socket.io';
 import { verifyJWT } from '~/utils/jwt';
-
-// Type definitions for socket interfaces
-interface SocketClient extends Socket {
-	// Additional properties if needed
-}
-
-interface SocketServer {
-	emit: (event: string, data: any) => void;
-	// Additional properties if needed
-}
+import { SocketClient, SocketServer } from 'interfaces';
 
 //key value pair of  user id and socket.id
 const users: {
