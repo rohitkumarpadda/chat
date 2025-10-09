@@ -14,6 +14,7 @@ This guide will help you deploy the CipherChat application with the frontend on 
 ### Option 1: Using render.yaml (Recommended)
 
 1. **Push your code to GitHub**
+
    ```bash
    git add .
    git commit -m "Add deployment configurations"
@@ -46,11 +47,11 @@ This guide will help you deploy the CipherChat application with the frontend on 
    - **Branch**: `master`
    - **Root Directory**: Leave empty (monorepo)
    - **Runtime**: `Node`
-   - **Build Command**: 
+   - **Build Command**:
      ```bash
      yarn install && yarn turbo run build --filter=cipherchat-api
      ```
-   - **Start Command**: 
+   - **Start Command**:
      ```bash
      cd apps/api && yarn start
      ```
@@ -94,7 +95,7 @@ This guide will help you deploy the CipherChat application with the frontend on 
 1. **Connect Repository** (same as Option 1)
 
 2. **Manual Build Settings**
-   - **Build command**: 
+   - **Build command**:
      ```bash
      cd ../.. && yarn install && yarn turbo run build --filter=cipherchat-web
      ```
@@ -108,6 +109,7 @@ This guide will help you deploy the CipherChat application with the frontend on 
 ### 1. Update CORS Origin
 
 Go back to Render and update the `CORS_ORIGIN` environment variable with your Netlify URL:
+
 ```
 https://your-app.netlify.app
 ```
@@ -122,10 +124,12 @@ https://your-app.netlify.app
 ### 3. Configure Custom Domain (Optional)
 
 **For Netlify:**
+
 - Go to Domain settings → Add custom domain
 - Follow DNS configuration instructions
 
 **For Render:**
+
 - Go to Settings → Custom Domain
 - Add your domain and configure DNS
 
@@ -158,11 +162,13 @@ https://your-app.netlify.app
 ### Frontend Issues
 
 **Build fails:**
+
 - Check that all environment variables are set
 - Verify Node version is 18
 - Check build logs in Netlify dashboard
 
 **Can't connect to backend:**
+
 - Verify `NEXT_PUBLIC_API_URL` is correct
 - Check CORS settings on backend
 - Check browser console for errors
@@ -170,16 +176,19 @@ https://your-app.netlify.app
 ### Backend Issues
 
 **Build fails:**
+
 - Check Render build logs
 - Verify build command is correct
 - Ensure all dependencies are in `package.json`
 
 **Database connection fails:**
+
 - Verify MongoDB URI is correct
 - Check MongoDB Atlas network access settings
 - Ensure database user has correct permissions
 
 **API not responding:**
+
 - Check Render logs for errors
 - Verify environment variables are set
 - Check health check endpoint
@@ -187,6 +196,7 @@ https://your-app.netlify.app
 ## Environment Variables Reference
 
 ### Backend (Render)
+
 ```
 NODE_ENV=production
 PORT=10000
@@ -197,6 +207,7 @@ CORS_ORIGIN=https://your-app.netlify.app
 ```
 
 ### Frontend (Netlify)
+
 ```
 NEXT_PUBLIC_API_URL=https://cipherchat-api.onrender.com
 NEXT_PUBLIC_SOCKET_URI=https://cipherchat-api.onrender.com
@@ -206,6 +217,7 @@ NODE_VERSION=18
 ## Continuous Deployment
 
 Both Netlify and Render support automatic deployments:
+
 - Push to `master` branch to trigger automatic deployment
 - Monitor deployments in respective dashboards
 - Roll back if needed
@@ -220,6 +232,7 @@ Both Netlify and Render support automatic deployments:
 ## Support
 
 For issues:
+
 - Netlify: [docs.netlify.com](https://docs.netlify.com)
 - Render: [render.com/docs](https://render.com/docs)
 - MongoDB Atlas: [docs.atlas.mongodb.com](https://docs.atlas.mongodb.com)

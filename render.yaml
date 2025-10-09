@@ -22,6 +22,6 @@ services:
       - key: CORS_ORIGIN
         sync: false
       # Add other environment variables as needed
-    
+
     # Auto-deploy from your git repository
     autoDeploy: true
