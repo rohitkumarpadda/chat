@@ -36,5 +36,5 @@ yarn-error.log*
 .docker/
 
 #ingore all pem files
-*.pem
+# *.pem
 .vscode
