@@ -123,17 +123,17 @@ const handleDisconnectEvent = (socket: Socket) => {
 const handleConnectEvent = (socket: Socket, io: SocketServer) => {
 	//Verify and decode the JWT from the bearer header or auth object
 	let tokenString = '';
-	
+
 	// Try to get token from Authorization header
 	if (socket.handshake.headers.authorization) {
 		tokenString = socket.handshake.headers.authorization.split(' ')[1] || '';
 	}
-	
+
 	// Fallback to auth object (Socket.IO v4+)
 	if (!tokenString && socket.handshake.auth?.token) {
 		tokenString = socket.handshake.auth.token;
 	}
-	
+
 	const token = verifyJWT(tokenString);
 
 	if (token) {
