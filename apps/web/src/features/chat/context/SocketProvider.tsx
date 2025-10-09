@@ -24,9 +24,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 		// Create socket with auth token
 		console.log('Creating socket with auth token...');
 		const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URI!, {
+			auth: {
+				token: accessToken,
+			},
 			extraHeaders: {
 				Authorization: `Bearer ${accessToken}`,
 			},
+			transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
 		});
 
 		newSocket.on('connect', () => {

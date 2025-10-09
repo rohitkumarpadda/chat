@@ -121,20 +121,30 @@ const handleDisconnectEvent = (socket: Socket) => {
 };
 
 const handleConnectEvent = (socket: Socket, io: SocketServer) => {
-	//Verify and decode the JWT from the bearer header
-	const token = verifyJWT(
-		socket.handshake.headers.authorization?.split(' ')[1] || ''
-	);
+	//Verify and decode the JWT from the bearer header or auth object
+	let tokenString = '';
+	
+	// Try to get token from Authorization header
+	if (socket.handshake.headers.authorization) {
+		tokenString = socket.handshake.headers.authorization.split(' ')[1] || '';
+	}
+	
+	// Fallback to auth object (Socket.IO v4+)
+	if (!tokenString && socket.handshake.auth?.token) {
+		tokenString = socket.handshake.auth.token;
+	}
+	
+	const token = verifyJWT(tokenString);
 
 	if (token) {
-		console.log(`user connected: ${socket.id} ${token.user.id}`);
+		console.log(`✅ User connected: ${socket.id} | User ID: ${token.user.id}`);
 		//   console.log("[handleConnectEvent]: ", token);
 
 		//Store the user id and socket id in the users object
 		addUser(socket.id, token.user.id);
 		console.log('[socket] users:', users);
 	} else {
-		console.log('[socket]: unauthorized');
+		console.log('❌ [socket]: unauthorized - no valid token');
 
 		io.emit('exception', {
 			message: 'Unauthorized',
