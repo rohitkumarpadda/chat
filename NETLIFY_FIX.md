@@ -11,6 +11,7 @@
 ## Changes Made
 
 ### 1. Updated `netlify.toml`
+
 - Removed manual `publish` directory (let plugin handle it)
 - Removed unnecessary redirects (Next.js plugin handles routing)
 - Updated build command to use `--filter=cipherchat-web...` (includes dependencies)
@@ -18,18 +19,22 @@
 - Kept `NODE_VERSION` and `YARN_VERSION` settings
 
 ### 2. Updated `packages/ui/package.json`
+
 - Added `peerDependencies` for React
 - This ensures proper dependency resolution in the monorepo
 
 ### 3. Updated `apps/web/next.config.js`
+
 - Added environment variable validation
 - Clear error messages if required env vars are missing
 - Proper TypeScript and ESLint configuration
 
 ### 4. Created `.npmrc` at root
+
 - Ensures proper workspace support
 
 ### 5. Created `apps/web/NETLIFY_DEPLOYMENT.md`
+
 - Comprehensive deployment instructions
 - Troubleshooting guide
 
@@ -43,6 +48,7 @@ Set these in Netlify Dashboard → Site settings → Environment variables:
 ## Deployment Steps
 
 1. **Commit and push these changes**:
+
    ```bash
    git add .
    git commit -m "Fix Netlify deployment configuration"

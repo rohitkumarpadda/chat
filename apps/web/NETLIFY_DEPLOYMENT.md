@@ -3,6 +3,7 @@
 ## Quick Setup
 
 ### 1. Install Netlify CLI (Optional, for local testing)
+
 ```bash
 npm install -g netlify-cli
 ```
@@ -26,6 +27,7 @@ Set these in your Netlify dashboard under **Site settings → Environment variab
 ### 4. Build Configuration (Auto-detected from netlify.toml)
 
 The `netlify.toml` file configures:
+
 - **Base directory**: `apps/web`
 - **Build command**: Runs from monorepo root with Turborepo
 - **Node version**: 18
@@ -34,18 +36,22 @@ The `netlify.toml` file configures:
 ## Troubleshooting
 
 ### Build fails with "Missing environment variables"
+
 - Make sure `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SOCKET_URI` are set in Netlify dashboard
 - These MUST be set before deployment
 
 ### Build fails with TypeScript errors
+
 - Check the build logs for specific errors
 - Run `yarn turbo run build --filter=cipherchat-web` locally to see the same errors
 
 ### Build fails with dependency errors
+
 - Clear Netlify cache and redeploy
 - Check that all dependencies in `package.json` are correct
 
 ### "Module not found" errors
+
 - This is a monorepo - make sure the build command runs from root (`cd ../..`)
 - Verify that workspace dependencies (`ui`, `interfaces`) are properly configured
 
