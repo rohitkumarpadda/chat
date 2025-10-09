@@ -20,7 +20,10 @@ if (missingEnvVars.length > 0) {
 
 const nextConfig = {
 	reactStrictMode: false,
-	transpilePackages: ['ui'],
+	// For Next.js 13.0.0, use experimental.transpilePackages
+	experimental: {
+		transpilePackages: ['ui'],
+	},
 	// Disable type checking during build if needed
 	typescript: {
 		ignoreBuildErrors: false,

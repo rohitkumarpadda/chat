@@ -1,11 +1,12 @@
 import { useMantineTheme } from '@mantine/core';
-import { IUserDoc, JWTUser, IUser, ISearchItem } from 'interfaces';
+import { IUserDoc, JWTUser, IUser as IUserAPI, ISearchItem } from 'interfaces';
+import { IUser as IUserLocal } from '~/features/chat';
 import { useState, useEffect } from 'react';
 import { textToColorScheme } from '~/utils/ui';
 import { UserIcon } from './UserIcon';
 
 interface IUserAvatarProps {
-	user?: JWTUser | IUserDoc | IUser | ISearchItem;
+	user?: JWTUser | IUserDoc | IUserAPI | ISearchItem | IUserLocal;
 	size?: number;
 }
 

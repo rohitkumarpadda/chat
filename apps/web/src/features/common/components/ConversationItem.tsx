@@ -7,6 +7,7 @@ import {
   Box,
 } from "@mantine/core";
 import { IUserDoc, JWTUser } from "interfaces";
+import { IUser } from "~/features/chat";
 import { UserAvatar } from "./UserAvatar";
 
 const useStyles = createStyles((theme) => ({
@@ -43,7 +44,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface ConversationItemProps extends UnstyledButtonProps {
-  user?: JWTUser | IUserDoc;
+  user?: JWTUser | IUserDoc | IUser;
   icon?: React.ReactNode;
   onClick?: () => void;
   active?: boolean;

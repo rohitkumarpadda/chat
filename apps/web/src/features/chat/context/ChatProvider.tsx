@@ -7,6 +7,7 @@ import {
 	DecryptMessage,
 	IConversationItem,
 	IMessageItem,
+	IUser,
 } from './ChatContext';
 import {
 	getMessageListSWR,
@@ -19,14 +20,6 @@ import { useSocket } from '../hooks';
 import { useKeyManager } from '~/features/key';
 import { decryptPgpMessage, encryptPgpMessage } from '~/utils/crypto';
 import { handleApiError } from '~/utils/errorHandler';
-
-// Type definitions for interfaces that aren't resolving
-interface IUserDoc {
-	_id: string;
-	name: string;
-	username: string;
-	email: string;
-}
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 	const { keyPair, passphrase } = useKeyManager();
@@ -78,8 +71,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 				id: item._id,
 				//Where we exclude the current user from the conversation
 				receiver: item.participants.find(
-					(u: IUserDoc) => u._id !== user.id
-				) as IUserDoc,
+					(u: IUser) => u._id !== user.id
+				) as IUser,
 			}));
 
 			setConversations(newConversations);

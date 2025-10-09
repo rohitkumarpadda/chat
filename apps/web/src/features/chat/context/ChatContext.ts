@@ -1,23 +1,19 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 import { KeyedMutator } from 'swr';
 import { PgpDecryptDetails, PgpEncryptDetails } from '~/utils/crypto';
+import { IConversationRes as IConversationResAPI } from 'interfaces';
 
-// Type definitions for interfaces that aren't resolving
-interface IUserDoc {
+// Simple user type for frontend use (without Mongoose Document properties)
+export interface IUser {
 	_id: string;
 	name: string;
 	username: string;
 	email: string;
 }
 
-interface IConversationRes {
-	_id: string;
-	participants: IUserDoc[];
-}
-
 export interface IConversationItem {
 	id: string;
-	receiver: IUserDoc;
+	receiver: IUser;
 }
 
 export interface IMessageItem {
@@ -52,7 +48,7 @@ export interface ChatContextProps {
 	conversationItem: IConversationItem | undefined;
 	getConversation: (id?: string) => IConversationItem | undefined;
 	conversations: IConversationItem[];
-	updateConversationList: KeyedMutator<IConversationRes>;
+	updateConversationList: KeyedMutator<IConversationResAPI>;
 	updateMessageList: KeyedMutator<any>;
 	conversationListLoading: boolean; // loading state for conversation list
 	sendMessage: (content: string) => void;
