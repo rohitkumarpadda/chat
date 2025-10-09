@@ -1,63 +1,69 @@
 
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useAuth } from '~/features/auth';
 import { SocketContext } from './SocketContext';
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URI);
-
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  //const [socket, setSocket] = useState<Socket | null>(null);
-  const [connected, setConnected] = useState(socket.connected);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [connected, setConnected] = useState(false);
   const { accessToken } = useAuth();
-  let init = false;
 
   useEffect(() => {
-    if (!init) {
-      socket.on('connect', () => {
-        console.log('connected');
-        setConnected(true);
-      });
-
-
-      socket.on('disconnect', () => {
-        console.log('disconnected');
+    // Only create socket if we have an access token
+    if (!accessToken) {
+      // If no token and socket exists, disconnect it
+      if (socket) {
+        console.log('No access token, disconnecting socket...');
+        socket.disconnect();
+        setSocket(null);
         setConnected(false);
-      });
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      init = true;
+      }
+      return;
     }
+
+    // Create socket with auth token
+    console.log('Creating socket with auth token...');
+    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URI!, {
+      extraHeaders: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    newSocket.on('connect', () => {
+      console.log('✅ Socket connected:', newSocket.id);
+      setConnected(true);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('❌ Socket disconnected:', reason);
+      setConnected(false);
+    });
+
+    newSocket.on('error', (error) => {
+      console.error('❌ Socket error:', error);
+    });
+
+    newSocket.on('exception', (data) => {
+      console.error('❌ Socket exception:', data);
+    });
+
+    setSocket(newSocket);
 
     return () => {
-      socket.off('connect');
-      socket.off('disconnect');
+      console.log('Cleaning up socket...');
+      newSocket.off('connect');
+      newSocket.off('disconnect');
+      newSocket.off('error');
+      newSocket.off('exception');
+      newSocket.disconnect();
     };
-  }, []);
-
-
-  //If we detect the access token has changed, we disconnect the socket
-  useEffect(() => {
-    if (socket) {
-      //Change the extra headers
-      socket.io.opts.extraHeaders = {
-        Authorization: `Bearer ${accessToken}`,
-      };
-
-      //Reconnect the socket
-      socket.disconnect().connect();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
-
-
-  return <>
-    <SocketContext.Provider value={{
-      socket,
-      connected
-    }}>
+  return (
+    <SocketContext.Provider value={{ socket, connected }}>
       {children}
     </SocketContext.Provider>
-  </>
+  );
 };
