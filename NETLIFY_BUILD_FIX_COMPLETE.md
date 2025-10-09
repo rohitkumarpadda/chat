@@ -1,7 +1,9 @@
 # Netlify Build Fixes - Complete Summary
 
 ## Problem
+
 The Netlify deployment was failing with exit code 1 during the build process. The errors were:
+
 1. Invalid Next.js configuration (`transpilePackages` property)
 2. TypeScript type mismatches between local and imported interfaces
 3. Incorrect environment variable setup
@@ -9,16 +11,19 @@ The Netlify deployment was failing with exit code 1 during the build process. Th
 ## Root Causes
 
 ### 1. Next.js Configuration Issue
+
 - **Problem**: `transpilePackages` was used as a root property in `next.config.js`
 - **Cause**: In Next.js 13.0.0, this property must be under `experimental`
 - **Fix**: Moved `transpilePackages` to `experimental.transpilePackages`
 
 ### 2. TypeScript Type Conflicts
+
 - **Problem**: Multiple definitions of `IConversationRes` and `IUserDoc` causing type mismatches
 - **Cause**: Local type definitions in ChatContext.ts conflicted with types from the `interfaces` package
 - **Impact**: SWR's `KeyedMutator` type was incompatible, and Mongoose Document types had 50+ extra properties
 
 ### 3. Type System Issues
+
 - **Problem**: `IUserDoc` from the `interfaces` package extends Mongoose `Document` with 50+ properties
 - **Cause**: Frontend components were trying to use plain objects with Document types
 - **Fix**: Created a simpler `IUser` type for frontend use
@@ -26,47 +31,58 @@ The Netlify deployment was failing with exit code 1 during the build process. Th
 ## Changes Made
 
 ### 1. `apps/web/next.config.js`
+
 ✅ Fixed `transpilePackages` configuration
+
 ```javascript
 experimental: {
   transpilePackages: ['ui'],
 }
 ```
+
 ✅ Added environment variable validation with clear error messages
 
 ### 2. `netlify.toml`
+
 ✅ Removed Netlify Next.js plugin (not installed)
 ✅ Simplified configuration
 ✅ Added proper publish directory
 
 ### 3. `apps/web/src/features/chat/context/ChatContext.ts`
+
 ✅ Removed duplicate `IConversationRes` interface
 ✅ Imported `IConversationResAPI` from `interfaces` package
 ✅ Created simple `IUser` interface for frontend (without Mongoose properties)
 ✅ Updated type references to use correct imports
 
 ### 4. `apps/web/src/features/chat/context/ChatProvider.tsx`
+
 ✅ Removed duplicate `IUserDoc` interface
 ✅ Imported `IUser` from ChatContext
 ✅ Updated type references in conversation mapping
 
 ### 5. `apps/web/src/features/common/components/ConversationItem.tsx`
+
 ✅ Added `IUser` to accepted user types
 ✅ Imported from `~/features/chat`
 
 ### 6. `apps/web/src/features/common/components/UserAvatar.tsx`
+
 ✅ Added support for local `IUser` type
 ✅ Renamed imports to avoid conflicts (`IUserAPI` and `IUserLocal`)
 
 ### 7. `packages/ui/package.json`
+
 ✅ Added React as `peerDependencies`
 
 ### 8. `.npmrc` (created)
+
 ✅ Added workspace support configuration
 
 ## Test Results
 
 ✅ **Local build successful**:
+
 ```
 Tasks:    1 successful, 1 total
 Time:    17.256s
@@ -93,6 +109,7 @@ Time:    17.256s
 ### Deployment Steps
 
 1. **Commit and push changes**:
+
    ```bash
    git add .
    git commit -m "Fix Netlify build: TypeScript types and Next.js config"
@@ -108,6 +125,7 @@ Time:    17.256s
    - Or manually trigger a deployment
 
 ## Build Command (from netlify.toml)
+
 ```bash
 cd ../.. && yarn install --frozen-lockfile && yarn turbo run build --filter=cipherchat-web...
 ```
