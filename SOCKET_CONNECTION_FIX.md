@@ -1,9 +1,11 @@
 # Socket Connection Fix
 
 ## Problem
+
 After successful login, the console showed:
-- ✅ "Login successful"  
-- ❌ "disconnected" 
+
+- ✅ "Login successful"
+- ❌ "disconnected"
 
 The socket was connecting but immediately disconnecting.
 
@@ -17,7 +19,7 @@ const socket = io(process.env.NEXT_PUBLIC_SOCKET_URI); // ❌ Created at module 
 
 export const SocketProvider = ({ children }) => {
   const { accessToken } = useAuth();
-  
+
   useEffect(() => {
     // Later tries to update headers
     socket.io.opts.extraHeaders = {
@@ -28,11 +30,13 @@ export const SocketProvider = ({ children }) => {
 ```
 
 **Issues:**
+
 1. **Socket created too early** - Created at module load time, before user logs in
 2. **No initial auth** - First connection had NO Authorization header
 3. **Backend requires auth** - Server immediately disconnects unauthenticated sockets
 
 **Flow:**
+
 ```
 Page loads → Socket created (no token) → Connects → Backend: "Unauthorized" → Disconnects ❌
 User logs in → Token available → Socket updates headers → Reconnects → Should work ✅
@@ -96,21 +100,25 @@ export const SocketProvider = ({ children }) => {
 ## Key Improvements
 
 ### 1. **Token-First Approach**
+
 - ✅ Socket is created ONLY when token exists
 - ✅ Token is included in initial connection
 - ✅ Backend authenticates successfully on first connect
 
 ### 2. **Proper State Management**
+
 - ✅ Socket is now in React state (not module-level)
 - ✅ Can be `null` when user is logged out
 - ✅ Recreated when user logs in/out
 
 ### 3. **Better Logging**
+
 - ✅ Emojis for visual clarity (✅/❌)
 - ✅ More descriptive messages
 - ✅ Error and exception handlers
 
 ### 4. **Clean Lifecycle**
+
 ```
 No Token → No Socket → Login → Token Available → Socket Created with Auth ✅
                                 Logout → Token Cleared → Socket Disconnected
@@ -119,17 +127,20 @@ No Token → No Socket → Login → Token Available → Socket Created with Aut
 ## Expected Behavior After Fix
 
 ### Before Login
+
 ```
 Console: (nothing - no socket created)
 ```
 
 ### After Login
+
 ```
 Console: Creating socket with auth token...
 Console: ✅ Socket connected: abc123xyz
 ```
 
 ### After Logout
+
 ```
 Console: No access token, disconnecting socket...
 Console: ❌ Socket disconnected: io client disconnect
@@ -143,6 +154,7 @@ Console: Cleaning up socket...
 ## Testing
 
 ### Local Testing
+
 ```bash
 cd apps/web
 yarn dev
@@ -155,7 +167,9 @@ yarn dev
 ```
 
 ### Production Testing
+
 After deploying to Netlify:
+
 1. Register/Login
 2. Check browser console
 3. Should see "✅ Socket connected" with socket ID
@@ -164,6 +178,7 @@ After deploying to Netlify:
 ## Build Status
 
 ✅ **Build Successful**
+
 ```
 Tasks:    1 successful, 1 total
 Time:    15.495s
@@ -180,6 +195,7 @@ git push
 ## Related Issues Fixed
 
 This also fixes:
+
 - Socket reconnection issues
 - Multiple socket connections
 - Memory leaks from sockets not being cleaned up
@@ -187,4 +203,4 @@ This also fixes:
 
 ---
 
-*Last Updated: October 9, 2025*
+_Last Updated: October 9, 2025_
