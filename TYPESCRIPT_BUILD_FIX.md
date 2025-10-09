@@ -1,15 +1,19 @@
 # TypeScript Build Fix for Render Deployment
 
 ## Problem
+
 When building on Render, TypeScript couldn't find type definitions for various packages (express, passport, lodash, etc.), resulting in TS7016 errors.
 
 ## Root Cause
+
 On Render's build environment, `@types/*` packages were in `devDependencies`, but by default, production builds don't install dev dependencies. Additionally, TypeScript and build tools need to be available during the build process.
 
 ## Solution
+
 Moved all TypeScript-related packages from `devDependencies` to `dependencies` in `apps/api/package.json`:
 
 ### Packages Moved to Dependencies:
+
 1. **Type Definitions:**
    - `@types/bcrypt`
    - `@types/body-parser`
@@ -29,6 +33,7 @@ Moved all TypeScript-related packages from `devDependencies` to `dependencies` i
    - `esbuild-register` - Required for running TypeScript directly in production
 
 ### Why This Works:
+
 - **Dependencies** are installed in both development and production environments
 - **DevDependencies** are only installed in development (unless `--production=false` is used)
 - Moving these packages ensures they're available during Render's build process
@@ -37,34 +42,36 @@ Moved all TypeScript-related packages from `devDependencies` to `dependencies` i
 ## Files Modified
 
 ### 1. `apps/api/package.json`
+
 ```json
 {
-  "dependencies": {
-    // Runtime dependencies
-    "bcrypt": "^5.1.0",
-    "express": "^4.18.2",
-    // ... other runtime deps
-    
-    // Type definitions (needed for build)
-    "@types/express": "^4.17.12",
-    "@types/passport": "^1.0.11",
-    // ... other @types packages
-    
-    // Build tools (needed for build and runtime)
-    "typescript": "^4.8.4",
-    "esbuild": "^0.15.14",
-    "esbuild-register": "^3.4.1"
-  },
-  "devDependencies": {
-    // Only needed in development
-    "eslint": "^7.32.0",
-    "nodemon": "^2.0.20",
-    // ... other dev-only tools
-  }
+	"dependencies": {
+		// Runtime dependencies
+		"bcrypt": "^5.1.0",
+		"express": "^4.18.2",
+		// ... other runtime deps
+
+		// Type definitions (needed for build)
+		"@types/express": "^4.17.12",
+		"@types/passport": "^1.0.11",
+		// ... other @types packages
+
+		// Build tools (needed for build and runtime)
+		"typescript": "^4.8.4",
+		"esbuild": "^0.15.14",
+		"esbuild-register": "^3.4.1"
+	},
+	"devDependencies": {
+		// Only needed in development
+		"eslint": "^7.32.0",
+		"nodemon": "^2.0.20"
+		// ... other dev-only tools
+	}
 }
 ```
 
 ### 2. `render.yaml`
+
 ```yaml
 buildCommand: yarn install --frozen-lockfile && yarn workspace cipherchat-api build
 startCommand: cd apps/api && node -r esbuild-register ./src/server.ts
@@ -73,6 +80,7 @@ startCommand: cd apps/api && node -r esbuild-register ./src/server.ts
 ## Verification
 
 Build now completes successfully:
+
 ```bash
 yarn workspace cipherchat-api build
 # Output: Done in 2.48s ✅
